@@ -1,8 +1,11 @@
 ﻿#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
 #include <locale>
-#include <filesystem>
 #include <cmath>
 #include "OpenXLSX.hpp"
+#include "SentAnalyze.hpp"
 
 using namespace OpenXLSX;
 
@@ -84,55 +87,80 @@ int main() {
 	*/
 
 
-	//국립국어원에서 다운받은 "한국어 학습용 단어 목록" 파일 열기, 
+	//국립국어원에서 다운받은 "한국어 학습용 단어 목록" 파일 열기, 따로 제작한 "조사 목록" 파일 열기
 	XLDocument korStudyVocabList;
+	XLDocument korParticleList;
 	std::string filePath_korStudyVocabList = "./한국어 학습용 단어 목록.xlsx";
+	std::string filePath_korParticleList = "./조사 목록.xlsx";
+
 	korStudyVocabList.open(filePath_korStudyVocabList);
+	korParticleList.open(filePath_korParticleList);
 
 	//엑셀 파일 원본에 따라 시트 설정
 	auto kSVL = korStudyVocabList.workbook().worksheet("한국어학습용어휘등급표 원어 정보 정리 쿼리");
+	auto kPL1 = korParticleList.workbook().worksheet("격조사(접속조사)");
+	auto kPL2 = korParticleList.workbook().worksheet("보조사");
 
-	//사용자 입력 문장의 각 글자를 wchar_t로 받아 배열에 저장, length 변수로 문장 길이 설정, spaceBefPeriod로 어절 구분
-	wchar_t koreanLetters[1000];
-	int length{ 0 };
-	int spaceBefPeriod{ 0 };
-	int temp{ 0 };
+	//입력 텍스트 파일 읽고 저장
 
-	std::wcin.getline(koreanLetters, 1000, '.');
+	std::wstring fileName;
+	std::wcin >> fileName;
 
-	while (koreanLetters[length] != '\0' && length < 1000)
-		length++;
-
-	while (koreanLetters[length] != '\0' && length < 1000) {
-		if (koreanLetters[length] == ' ') {
-			temp++;
-			spaceBefPeriod = temp;
-		}
-		length++;
+	std::wifstream inputF(fileName);
+	if (!inputF) {
+		std::cout << "Error opening file" << std::endl;
+		return 1;
 	}
-		
+
+	std::wstringstream fileContent;
+	fileContent << inputF.rdbuf();
+	std::wstring contents = fileContent.str();
+
+	std::vector<wchar_t> articleWchar(contents.begin(), contents.end());
+	articleWchar.push_back('\0');
+
+	std::wcout << contents << std::endl;
 	/*
+	char fileName[1000];
+	std::cin >> fileName;
 
-	//문장 분석 시작
-	for (int n{ 0 }; n <= length; n++) {
-		while (koreanLetters[n] != ' ') {
+	std::vector<wchar_t> article;
 
-		}
+	std::ifstream inputF(fileName);
+	std::string fileContent;
+
+	while (std::getline(inputF, fileContent)) {
+		std::cin >> fileContent;
+	}
+
+	int articleLength = sizeof(fileContent) / sizeof(std::string);
+
+	for (int i{ 0 }; i <= articleLength; i++) {
+		article.push_back(1);
+		article.at(i) = 
 	}
 
 	*/
 
-	//입력 받은 문장 출력; 테스트용
-	for (int i{ 0 }; i <= length; i++) {
-		std::wcout << koreanLetters[i];
-	}
-	std::cout << '.' << '\n';
+	//FILE* inputF = fopen(fileName, "r");
+	
+	/*
+	* 1. paragraph 문장으로 분할
+	* 2. 문장 당 독립적인 계산 공간 생성
+	* 3. 
+	*/
 
-	std::cout << length << ", " << spaceBefPeriod << std::endl;
+
+	
+	
+	
+	
 
 
 	//엑셀 파일 닫기
 	korStudyVocabList.close();
+	korParticleList.close();
+	inputF.close();
 
 	return 0;
 }
