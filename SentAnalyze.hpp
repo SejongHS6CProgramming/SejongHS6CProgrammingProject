@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <locale>
 #include <filesystem>
 #include <cmath>
@@ -6,22 +7,31 @@
 
 using namespace OpenXLSX;
 
-class articleDiv {
-public:
-	wchar_t article[1000];
 
-	void artiDiv(wchar_t article) {
-
-	}
-};
 
 
 class sentAnalysis {
-
 public:
+
 	wchar_t sentDivide(wchar_t sentence[]) {
 		//사용자 입력 문장의 각 글자를 wchar_t로 받아 배열에 저장, length 변수로 문장 길이 설정, spaceBefPeriod로 어절 구분
-		wchar_t koreanLetters[1000];
+
+		std::vector<wchar_t> wordSeg;
+		int length{ 0 };
+
+
+		while (sentence[length] != '\0') {
+			length++;
+		}
+
+		for (int i{ 0 }; i < length; i++) {
+			wordSeg.at(i) = sentence[i];
+		}
+
+
+
+
+		/*wchar_t koreanLetters[1000];
 		int length{ 0 };
 		int spaceBefPeriod{ 0 };
 		int temp{ 0 };
@@ -38,6 +48,8 @@ public:
 			}
 			length++;
 		}
+
+		*/
 	};
 
 	wchar_t sentConsistAnalysis(wchar_t sentence[]) {

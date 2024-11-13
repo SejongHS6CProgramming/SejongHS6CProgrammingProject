@@ -64,8 +64,6 @@ int main() {
 	std::wcin.imbue(std::locale("ko_KR.UTF-8"));
 	std::wcout.imbue(std::locale("ko_KR.UTF-8"));
 
-
-
 	/*
 	* 
 	* 테스트 및 표본 코드
@@ -96,13 +94,14 @@ int main() {
 	korStudyVocabList.open(filePath_korStudyVocabList);
 	korParticleList.open(filePath_korParticleList);
 
+
 	//엑셀 파일 원본에 따라 시트 설정
 	auto kSVL = korStudyVocabList.workbook().worksheet("한국어학습용어휘등급표 원어 정보 정리 쿼리");
 	auto kPL1 = korParticleList.workbook().worksheet("격조사(접속조사)");
 	auto kPL2 = korParticleList.workbook().worksheet("보조사");
 
-	//입력 텍스트 파일 읽고 저장
 
+	//입력 텍스트 파일 읽고 저장
 	std::wstring fileName;
 	std::wcin >> fileName;
 
@@ -116,31 +115,41 @@ int main() {
 	fileContent << inputF.rdbuf();
 	std::wstring contents = fileContent.str();
 
-	std::vector<wchar_t> articleWchar(contents.begin(), contents.end());
-	articleWchar.push_back('\0');
+	std::vector<wchar_t> wcharArticle(contents.begin(), contents.end());
+	wcharArticle.push_back('\0');
 
-	std::wcout << contents << std::endl;
-	/*
-	char fileName[1000];
-	std::cin >> fileName;
 
-	std::vector<wchar_t> article;
+	//이차원 벡터를 이용해서 문장의 어절 단위로 각 인덱스에 wchar_t로 넣음
+	std::vector<std::vector<wchar_t[20]>> sentPerDiv;
+	std::vector<int> lengthOfSentence;
+	std::vector<int> temp;
+	int sentRowIdx{ 0 };
 
-	std::ifstream inputF(fileName);
-	std::string fileContent;
+	for (int i{ 0 }; i < wcharArticle.size(); i++) {
+		lengthOfSentence.push_back(' ');
+		if (temp.size() == 0) {
+			if (wcharArticle.at(i) == '.' || wcharArticle.at(i) == '?' || wcharArticle.at(i) == '!') {
+				for (int j{ 0 }; j < lengthOfSentence.size() - temp.size(); j++) {
+					sentPerDiv.at(sentRowIdx++).at(j) = 'h';
+					for (int k{ 0 }; k <= lengthOfSentence.size(); k++) {
+						temp.push_back(' ');
+					}
+				}
+			}
+		}
 
-	while (std::getline(inputF, fileContent)) {
-		std::cin >> fileContent;
+		else {
+			if (wcharArticle.at(i) == '.' || wcharArticle.at(i) == '?' || wcharArticle.at(i) == '!') {
+				for (int j{ 0 }; j < lengthOfSentence.size() - temp.size() - 1; j++) {
+					sentPerDiv.at(sentRowIdx++).at(j);
+					for (int k{ 0 }; k <= lengthOfSentence.size() - 1; k++) {
+						temp.push_back(' ');
+					}
+				}
+			}
+		}
 	}
-
-	int articleLength = sizeof(fileContent) / sizeof(std::string);
-
-	for (int i{ 0 }; i <= articleLength; i++) {
-		article.push_back(1);
-		article.at(i) = 
-	}
-
-	*/
+	
 
 	//FILE* inputF = fopen(fileName, "r");
 	
