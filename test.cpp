@@ -4,6 +4,7 @@
 #include <vector>
 #include <locale>
 #include <cmath>
+#include <cwchar>
 #include "OpenXLSX.hpp"
 #include "SentAnalyze.hpp"
 
@@ -64,26 +65,6 @@ int main() {
 	std::wcin.imbue(std::locale("ko_KR.UTF-8"));
 	std::wcout.imbue(std::locale("ko_KR.UTF-8"));
 
-	/*
-	* 
-	* 테스트 및 표본 코드
-	* 
-	*XLDocument test;
-	*std::string filePath = "./한국어 학습용 단어 목록.xlsx";
-	*
-	*test.open(filePath);
-	*auto wks = test.workbook().worksheet("한국어학습용어휘등급표 원어 정보 정리 쿼리");
-	*
-	*std::string vB7 = wks.cell("B7").value();
-	*
-	*std::cout << vB7 << std::endl;
-	*
-	*test.close();
-	*
-	*
-	*
-	*/
-
 
 	//국립국어원에서 다운받은 "한국어 학습용 단어 목록" 파일 열기, 따로 제작한 "조사 목록" 파일 열기
 	XLDocument korStudyVocabList;
@@ -100,7 +81,9 @@ int main() {
 	auto kPL1 = korParticleList.workbook().worksheet("격조사(접속조사)");
 	auto kPL2 = korParticleList.workbook().worksheet("보조사");
 
-
+	auto rngForkPL1 = kPL1.range(XLCellReference("B1"), XLCellReference("P5"));
+	auto rngForkPL2 = kPL2.range(XLCellReference("B1"), XLCellReference("W1"));
+	auto rngForkSVL = kSVL.range(XLCellReference("A1"), XLCellReference("B5966"));
 	//입력 텍스트 파일 읽고 저장
 	std::wstring fileName;
 	std::wcin >> fileName;
@@ -123,6 +106,11 @@ int main() {
 	std::vector<std::vector<wchar_t[20]>> sentPerDiv;
 	std::vector<int> lengthOfSentence;
 	std::vector<int> temp;
+
+
+	sentAnalysis sentence;
+	sentence.sentDivide();
+
 	int sentRowIdx{ 0 };
 
 	for (int i{ 0 }; i < wcharArticle.size(); i++) {
@@ -130,7 +118,7 @@ int main() {
 		if (temp.size() == 0) {
 			if (wcharArticle.at(i) == '.' || wcharArticle.at(i) == '?' || wcharArticle.at(i) == '!') {
 				for (int j{ 0 }; j < lengthOfSentence.size() - temp.size(); j++) {
-					sentPerDiv.at(sentRowIdx++).at(j) = 'h';
+					sentPerDiv.at(sentRowIdx++).at(j) = ;
 					for (int k{ 0 }; k <= lengthOfSentence.size(); k++) {
 						temp.push_back(' ');
 					}
@@ -150,8 +138,6 @@ int main() {
 		}
 	}
 	
-
-	//FILE* inputF = fopen(fileName, "r");
 	
 	/*
 	* 1. paragraph 문장으로 분할
@@ -159,10 +145,19 @@ int main() {
 	* 3. 
 	*/
 
+	wchar_t eachWordSeg[20];
 
 	
 	
-	
+	for (int i{ 0 }; i < sentPerDiv.at(i).size(); i++) {
+		int rowSize = sentPerDiv.at(i).size();
+		for (int j{ 0 }; j < rowSize; j++) {
+			int indexSize = std::wcslen(sentPerDiv.at(i).at(j));
+			for (int k{ indexSize - 1 }; k >= 0; k--) {
+				/*eachWordSeg[k] = */if (sentPerDiv.at(i).at(j)[k] == cell(rngForkPL1.begin(), rngForkPL1.end(), 0, [](wchar_t a, XLCell& ));
+			}
+		}
+	}
 	
 
 

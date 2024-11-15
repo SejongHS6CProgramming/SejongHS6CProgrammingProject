@@ -13,6 +13,8 @@ using namespace OpenXLSX;
 class sentAnalysis {
 public:
 
+	wchar_t sentence[1000];
+
 	wchar_t sentDivide(wchar_t sentence[]) {
 		//사용자 입력 문장의 각 글자를 wchar_t로 받아 배열에 저장, length 변수로 문장 길이 설정, spaceBefPeriod로 어절 구분
 
