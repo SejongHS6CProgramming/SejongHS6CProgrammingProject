@@ -111,139 +111,142 @@ int main() {
 	//각각의 sheet 내에서 사용할 값이 있는 범위 설정,
 	// auto 범위이름 = 시트이름.range(시작, 끝);
 	auto rngForkPL1 = kPL1.range(XLCellReference("B1"), XLCellReference("P5"));
+	auto rngForkPL1_Row1 = kPL1.range(XLCellReference("B1"), XLCellReference("D1"));
+	auto rngForkPL1_Row2 = kPL1.cell(XLCellReference("B2"));
+	auto rngForkPL1_Row3 = kPL1.range(XLCellReference("B3"), XLCellReference("D3"));
+	auto rngForkPL1_Row4 = kPL1.range(XLCellReference("B4"), XLCellReference("P4"));
+	auto rngForkPL1_Row5 = kPL1.range(XLCellReference("B5"), XLCellReference("H4"));
+
 	auto rngForkPL2 = kPL2.range(XLCellReference("B1"), XLCellReference("W1"));
+
 	auto rngForkSVL = kSVL.range(XLCellReference("A1"), XLCellReference("B5966"));
+
+	
+	uint64_t kSVLRowCount{ 0 };
+	uint64_t kPL1RowCount{ 0 };
+	uint64_t kPL2RowCount{ 0 };
+
+	for (auto& row : kSVL.rows()) {
+		kSVLRowCount += std::count_if(row.cells().begin(), row.cells().end(), [](const XLCell& c) {
+			return c.value().type() != XLValueType::Empty;
+			});
+	}
+
+	for (auto& row : kPL1.rows()) {
+		kPL1RowCount += std::count_if(row.cells().begin(), row.cells().end(), [](const XLCell& c) {
+			return c.value().type() != XLValueType::Empty;
+			});
+	}
+
+	for (auto& row : kPL2.rows()) {
+		kPL2RowCount += std::count_if(row.cells().begin(), row.cells().end(), [](const XLCell& c) {
+			return c.value().type() != XLValueType::Empty;
+			});
+	}
 
 	//입력 텍스트 파일 읽고 저장
 	//wstring은 wide string, 한국어 extended unicode 입력받기 위함
-	std::wstring fileName;
+	std::string fileName;
 	//열을 파일의 이름 입력받음
-	std::wcin >> fileName;
-
+	std::cin >> fileName;
 	//wifstream은 wide input file stream의 줄임말, inputF라는 파일 포인터 임의로 설정
-	std::wifstream inputF(fileName);
+	//std::ifstream inputF(fileName);
 	//만약 위에서 입력받은 이름의 파일을 찾지 못한다면 다음을 출력
+
+
+	std::ifstream inputF(fileName, std::ios::binary);
 	if (!inputF) {
-		std::cout << "Error opening file" << std::endl;
+		std::cout << "Error opoening file" << std::endl;
 		return 1;
 	}
-	 
-	//wide string stream, extended unicode를 문장단위로 저장할 저장 공간의 이름 지정
-	std::wstringstream fileContent;
-	//바로 위의 fileContent에다가 위에서 설정했던 inputF의 내용을 읽어서 저장
-	fileContent << inputF.rdbuf();
-	//마지막으로, contents라는 저장 공간에다가 바로 위에서 입력받은 값을 저장
-	std::wstring contents = fileContent.str();
 
-	//일차원 벡터로 wchar_t 배열 만듬, wchar_t는 한국어를 글자 단위로 입력받아 저장하기 위함.
-	//contents에 있는 내용을 처음부터 끝까지 글자 단위로 나누어 배열에 한 글자씩 저장
-	std::vector<wchar_t> wcharArticle(contents.begin(), contents.end());
-	wcharArticle.push_back('\0');
+	inputF.seekg(0, std::ios::end);
+	std::streamsize fileSize = inputF.tellg();
+	inputF.seekg(0, std::ios::beg);
 
+	char* inputFBuffer = new char[fileSize];
 
-	//이차원 벡터를 이용해서 문장의 어절 단위로 각 인덱스에 wchar_t로 넣음
-	//일반적인 배열은 다음과 같이 이차원으로 만듦: int arr[][];
-	//벡터는 벡터 안에 또 다른 벡터를 감싸서 이차원으로 만듦:
-	//
-	//std::vector<std::vector<int>> vec = {
-	//		{1, 2, 3, 4, 5}
-	//		{6, 7, 8, 9, 10}
-	//		{11, 12, 13, 14, 15}
-	// 
-	// };
-	//
-	//위와 같은 형식으로 이루어짐
-	//가장 밖에 있는 벡터가 1, 6, 11의 값을 지정하여 배열의 행을 설정
-	//안에 있는 벡터가, 행이 1일 경우 뒤에 2, 3, 4, 5 , 행이 6일 경우 뒤에 7, 8, 9, 10 ...
-	//과 같은 방식으로 
-
-	//여기에서는 아까 wcharArticle이라는 벡터 배열에 글자 단위로 입력했던 값을 어절별로 나누어 각 인덱스에 저장할 예정
-	//sentPerDiv, sentence per division, 어절별로 넣을 이차원 벡터 선언
-	std::vector<std::vector<wchar_t>> sentPerDiv;
-	//length of sentence, 문장의 길이를 알아내어 한 행에 들어갈 문장의 길이 파악, for 반복문의 조건으로 사용됨
-	int lengthOfSentence{};
-
-	//std::vector<int> temp; <-- 원래는 사용했으나 필요 없을 예정
-
-	//행을 위에서 설정했으니, 이번에는 열 설정, 열의 인덱스 번호
-	int sentRowIdx{ 0 };
-	//아까 wcharArticle에 받은 내용의 길이를 .size()를 통해 얻어 n에 저장
-	int n = wcharArticle.size();
-	//for 반복문을 실행하는 동안 sentPerDiv에 입력을 한 누적된 문장의 길이 파악, 파악하여 다음에 어디부터 입력을 하면 되는지 앎
-	int accumulateOfSentences{ 0 };
-
-	//for loop 실행, i 변수는 벡터 배열의 행의 역할을 할 예정
-	for (int i{ 0 }; i < n; i++) {
-		//행의 길이만큼 배열의 행 크기 늘림
-		//.push_back()이 배열의 크기를 괄호 안에 값으로 늘림 
-		//ex) .push_back(' ') 이라 하면 벡터의 길이를 1만큼 늘리는 동시에 그 빈칸에 ' '를 넣음
-		//아래의 .push_back(std::vector<wchar_t>()); 는 배열의 크기를 1만큼 늘리고, 늘린 데에 또 다른 벡터 배열을 넣는다는 거임
-		sentPerDiv.push_back(std::vector<wchar_t>());
-		//문장 길이 파악
-		lengthOfSentence++;
-		//누적된 문장 길이 파악
-		accumulateOfSentences++;
-		//만약 배열의 길이를 늘리는 과정에서 wcharArticle의 i 번째 인덱스 값이 . or ! or ? 라면 다음의 if문 실행
-		if (wcharArticle.at(i) == '.' || wcharArticle.at(i) == '!' || wcharArticle.at(i) == '?') {
-			//위에서 문장의 길이를 파악한 것이 조건으로 반복문 실행
-			for (int j{ 0 }; j < lengthOfSentence; j++) {
-				//sentPerDiv의 i번 째 행의 벡터 배열을 1만큼 늘리고, 늘린 칸에 wcharArticle의 accumulateOfSentences 인덱스의 값(한 글자)을 넣음
-				sentPerDiv[i].push_back(wcharArticle.at(accumulateOfSentences));
-			}
-			//문장의 길이를 0으로 리셋
-			lengthOfSentence = 0;
-		}
+	if (inputF.read(inputFBuffer, fileSize)) {
+		std::cout << inputFBuffer << fileSize << std::endl;
 	}
 
-
-	//아래는 아직 짜는 중
-
+	
 	/*
-	for (int i{ 0 }; i < wcharArticle.size(); i++) {
-		lengthOfSentence.push_back(' ');
-		if (temp.size() == 0) {
-			if (wcharArticle.at(i) == '.' || wcharArticle.at(i) == '?' || wcharArticle.at(i) == '!') {
-				for (int j{ 0 }; j < lengthOfSentence.size() - temp.size(); j++) {
-					sentPerDiv.at(sentRowIdx++).at(j) = ;
-					for (int k{ 0 }; k <= lengthOfSentence.size(); k++) {
-						temp.push_back(' ');
-					}
-				}
-			}
-		}
+	int distanceOfkSVL = std::distance(rngForkSVL.begin(), rngForkSVL.end());
+	int distanceOfkPL1 = std::distance(rngForkPL1.begin(), rngForkPL1.end());
+	int distanceOfkPL2 = std::distance(rngForkPL2.begin(), rngForkPL2.end());
 
-		else {
-			if (wcharArticle.at(i) == '.' || wcharArticle.at(i) == '?' || wcharArticle.at(i) == '!') {
-				for (int j{ 0 }; j < lengthOfSentence.size() - temp.size() - 1; j++) {
-					sentPerDiv.at(sentRowIdx++).at(j);
-					for (int k{ 0 }; k <= lengthOfSentence.size() - 1; k++) {
-						temp.push_back(' ');
-					}
-				}
-			}
-		}
+	for (int i{ 0 }; i < distanceOfkPL1; i++) {
+		for (int j{ 0 }; )
+		wchar_t* charArticle = std::wcsstr(wcharArticle, )
 	}
 	*/
 	
+	/*
+	이차원 벡터를 이용해서 문장의 어절 단위로 각 인덱스에 wchar_t로 넣음
+	일반적인 배열은 다음과 같이 이차원으로 만듦: int arr[][];
+	벡터는 벡터 안에 또 다른 벡터를 감싸서 이차원으로 만듦:
+	
+	std::vector<std::vector<int>> vec = {
+		{1, 2, 3, 4, 5}
+		{6, 7, 8, 9, 10}
+		{11, 12, 13, 14, 15}
+	 
+	};
+	
+	위와 같은 형식으로 이루어짐
+	가장 밖에 있는 벡터가 1, 6, 11의 값을 지정하여 배열의 행을 설정
+	안에 있는 벡터가, 행이 1일 경우 뒤에 2, 3, 4, 5 , 행이 6일 경우 뒤에 7, 8, 9, 10 ...
+	과 같은 방식으로 
+	*/
+	int rowNum{ 0 };
+	int colNum{ 0 };
+	char* context = nullptr;
+
+	char* charArticlePtr = strtok_s(inputFBuffer, ".!?", &context);
+
+	std::vector<std::vector<char*>> articleDiv;
+
+	while (charArticlePtr != nullptr) {
+		std::vector<char*> token;
+		char* sentencePtr = strtok_s(charArticlePtr, " ", &context);
+		while (sentencePtr != nullptr) {
+			token.push_back(sentencePtr);
+			sentencePtr = strtok_s(nullptr, " ", &context);
+			colNum++;
+		}
+
+		for (int i{ 0 }; i < rowNum; i++) {
+			for (int j{ 0 }; j < colNum; j++) {
+				std::cout << articleDiv.at(i).at(j);
+			}
+		}
+
+		articleDiv.push_back(token);
+		charArticlePtr = strtok_s(nullptr, ".!?", &context);
+		rowNum++;
+	}
+
+	std::cout << articleDiv.at(0).at(0) << ' ' << articleDiv.at(0).at(1) << ' ' << articleDiv.at(0).at(2);
+	
+	
+
+
 	/*
 	* 1. paragraph 문장으로 분할
 	* 2. 문장 당 독립적인 계산 공간 생성
 	* 3. 
 	*/
 
-	
 
-	
-	/*
-	for (int i{ 0 }; i < sentPerDiv.at(i).size(); i++) {
-		int rowSize = sentPerDiv.at(i).size();
-		for (int j{ 0 }; j < rowSize; j++) {
-			int indexSize = std::wcslen(sentPerDiv.at(i).at(j));
-			for (int k{ indexSize - 1 }; k >= 0; k--) {
-				if (sentPerDiv.at(i).at(j)[k] == std::find_if(rngForkPL1.begin(), rngForkPL1.end(), 0)
-			}
-		}
-		*/
+
+
+	delete[] inputFBuffer;
+	inputF.close();
+	korStudyVocabList.close();
+	korParticleList.close();
+
+	return 0;
 	}
 	
 
