@@ -22,6 +22,7 @@
 #include <cwchar>
 #include <numeric>
 #include <algorithm>
+#include <codecvt>
 
 //외부에서 다운받고 설치한 헤더 소스 파일 --> 프로그램이 엑셀 파일 접근/수정 등을 할 수 있게 함
 #include "OpenXLSX.hpp"
@@ -87,6 +88,90 @@ int main() {
 	std::wcout.imbue(std::locale("ko_KR.UTF-8"));
 
 
+	/*===========================================================================================================*/
+
+	std::fstream kPL_sheet1("조사 목록-격조사.csv");
+	
+
+	kPL_sheet1.seekg(0, std::ios::end);
+	std::streamsize kPL_sheet1_fileSize = kPL_sheet1.tellg();
+	kPL_sheet1.seekg(0, std::ios::beg);
+
+	char* kPL1_inputFBuffer = new char[kPL_sheet1_fileSize];
+	kPL_sheet1.read(kPL1_inputFBuffer, kPL_sheet1_fileSize);
+
+	char* context_kPL1 = nullptr;
+	char* kPL1_DivPtr = strtok_s(kPL1_inputFBuffer, "\n", &context_kPL1);
+	std::vector<std::vector<char*>> kPL1_Div;
+
+	while (kPL1_DivPtr != nullptr) {
+		std::vector<char*> token;
+		char* wordNPartsOfSpeech_Div = strtok_s(kPL1_DivPtr, ",", &context_kPL1);
+		while (wordNPartsOfSpeech_Div != nullptr) {
+			token.push_back(wordNPartsOfSpeech_Div);
+			wordNPartsOfSpeech_Div = strtok_s(nullptr, ",", &context_kPL1);
+		}
+		kPL1_Div.push_back(token);
+		kPL1_DivPtr = strtok_s(nullptr, "\n", &context_kPL1);
+	}
+
+	/*===========================================================================================================*/
+
+	std::fstream kPL_sheet2("조사 목록-보조사.csv");
+
+
+	kPL_sheet2.seekg(0, std::ios::end);
+	std::streamsize kPL_sheet2_fileSize = kPL_sheet2.tellg();
+	kPL_sheet2.seekg(0, std::ios::beg);
+
+	char* kPL2_inputFBuffer = new char[kPL_sheet2_fileSize];
+	kPL_sheet2.read(kPL2_inputFBuffer, kPL_sheet2_fileSize);
+
+	char* context_kPL2 = nullptr;
+	char* kPL2_DivPtr = strtok_s(kPL2_inputFBuffer, "\n", &context_kPL2);
+	std::vector<std::vector<char*>> kPL2_Div;
+
+	while (kPL2_DivPtr != nullptr) {
+		std::vector<char*> token;
+		char* wordNEmphasisNYield_Div = strtok_s(kPL2_DivPtr, ",", &context_kPL2);
+		while (wordNEmphasisNYield_Div != nullptr) {
+			token.push_back(wordNEmphasisNYield_Div);
+			wordNEmphasisNYield_Div = strtok_s(nullptr, ",", &context_kPL2);
+		}
+		kPL2_Div.push_back(token);
+		kPL2_DivPtr = strtok_s(nullptr, "\n", &context_kPL2);
+	}
+
+	/*===========================================================================================================*/
+
+	std::fstream rieulEndSyllable("ㄹ받침 한글 음절 유니코드.txt");
+
+
+	rieulEndSyllable.seekg(0, std::ios::end);
+	std::streamsize rieulEndSyllable_fileSize = rieulEndSyllable.tellg();
+	rieulEndSyllable.seekg(0, std::ios::beg);
+
+	char* rieulEndSyllable_inputFBuffer = new char[rieulEndSyllable_fileSize];
+	rieulEndSyllable.read(rieulEndSyllable_inputFBuffer, rieulEndSyllable_fileSize);
+
+	char* context_rieulEndSyllable = nullptr;
+	char* rieulEndSyllable_DivPtr = strtok_s(rieulEndSyllable_inputFBuffer, "\n", &context_rieulEndSyllable);
+	std::vector<std::vector<char*>> rieulEndSyllable_Div;
+
+	while (rieulEndSyllable_DivPtr != nullptr) {
+		std::vector<char*> token;
+		char* wordNHex_Div = strtok_s(rieulEndSyllable_DivPtr, ",", &context_rieulEndSyllable);
+		while (wordNHex_Div != nullptr) {
+			token.push_back(wordNHex_Div);
+			wordNHex_Div = strtok_s(nullptr, ",", &context_rieulEndSyllable);
+		}
+		rieulEndSyllable_Div.push_back(token);
+		rieulEndSyllable_DivPtr = strtok_s(nullptr, "\n", &context_rieulEndSyllable);
+	}
+
+	/*===========================================================================================================*/
+
+
 	//입력 텍스트 파일 읽고 저장
 	//wstring은 wide string, 한국어 extended unicode 입력받기 위함
 	std::string fileName;
@@ -99,7 +184,7 @@ int main() {
 
 	std::ifstream inputF(fileName, std::ios::binary);
 	if (!inputF) {
-		std::cout << "Error opoening file" << std::endl;
+		std::cout << "Error opening file" << std::endl;
 		return 1;
 	}
 
@@ -108,10 +193,7 @@ int main() {
 	inputF.seekg(0, std::ios::beg);
 
 	char* inputFBuffer = new char[fileSize];
-
-	if (inputF.read(inputFBuffer, fileSize)) {
-		std::cout << inputFBuffer << fileSize << std::endl;
-	}
+	inputF.read(inputFBuffer, fileSize);
 
 	/*
 	이차원 벡터를 이용해서 문장의 어절 단위로 각 인덱스에 wchar_t로 넣음
@@ -159,7 +241,7 @@ int main() {
 
 	std::cout << '\n';
 	std::cout << articleDiv.at(0).at(0) << ' ' << articleDiv.at(0).at(1) << ' ' << articleDiv.at(0).at(2) << std::endl;
-	
+	std::cout << kPL2_Div.at(0).at(0) << ' ' << kPL2_Div.at(0).at(1) << ' ' << kPL2_Div.at(0).at(2) << std::endl;
 	
 
 
@@ -169,7 +251,14 @@ int main() {
 	* 3. 
 	*/
 
+	std::wstring koreanText = L"갈갤걀걜걸겔결곌";
 
+	for (wchar_t ch : koreanText) {
+		
+		std::wcout << ch << ": U+" << (int)ch << std::endl;
+	}
+
+	//'ㄹ' 받침만 있는 한글 음절은 28 차이가 남
 
 
 	delete[] inputFBuffer;
