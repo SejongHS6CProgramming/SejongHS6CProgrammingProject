@@ -87,63 +87,6 @@ int main() {
 	std::wcout.imbue(std::locale("ko_KR.UTF-8"));
 
 
-	//국립국어원에서 다운받은 "한국어 학습용 단어 목록" 파일 열기, 따로 제작한 "조사 목록" 파일 열기
-	//openXLSX 외부 소스파일의 문법, 크게 중요하진 않음
-	//바로 아래 두 줄을 통해 엑셀 파일을 열기 전 프로그램 내 파일 명 지정
-	XLDocument korStudyVocabList;
-	XLDocument korParticleList;
-	//아래 두 줄로 파일 이름 설정
-	std::string filePath_korStudyVocabList = "./한국어 학습용 단어 목록.xlsx";
-	std::string filePath_korParticleList = "./조사 목록.xlsx";
-	//아래 두 줄로 위에서 지정한 파일 명에 대응하는 엑셀 파일 지정하여 열음
-	korStudyVocabList.open(filePath_korStudyVocabList);
-	korParticleList.open(filePath_korParticleList);
-
-
-	//엑셀 파일 원본에 따라 시트 설정
-	//엑셀 파일에서 사용할 sheet 설정
-	//위에서 korStudyVocabList로 연 엑셀 파일에서 sheet 이름이 다음과 같은 걸 사용하겠다는 것, kSVL로 지정
-	auto kSVL = korStudyVocabList.workbook().worksheet("한국어학습용어휘등급표 원어 정보 정리 쿼리");
-	//위의 korParticleList의 엑셀 파일에는 sheet가 두 개 있는데, 이를 각각 kPL1과 kPL2로 지정
-	auto kPL1 = korParticleList.workbook().worksheet("격조사(접속조사)");
-	auto kPL2 = korParticleList.workbook().worksheet("보조사");
-
-	//각각의 sheet 내에서 사용할 값이 있는 범위 설정,
-	// auto 범위이름 = 시트이름.range(시작, 끝);
-	auto rngForkPL1 = kPL1.range(XLCellReference("B1"), XLCellReference("P5"));
-	auto rngForkPL1_Row1 = kPL1.range(XLCellReference("B1"), XLCellReference("D1"));
-	auto rngForkPL1_Row2 = kPL1.cell(XLCellReference("B2"));
-	auto rngForkPL1_Row3 = kPL1.range(XLCellReference("B3"), XLCellReference("D3"));
-	auto rngForkPL1_Row4 = kPL1.range(XLCellReference("B4"), XLCellReference("P4"));
-	auto rngForkPL1_Row5 = kPL1.range(XLCellReference("B5"), XLCellReference("H4"));
-
-	auto rngForkPL2 = kPL2.range(XLCellReference("B1"), XLCellReference("W1"));
-
-	auto rngForkSVL = kSVL.range(XLCellReference("A1"), XLCellReference("B5966"));
-
-	
-	uint64_t kSVLRowCount{ 0 };
-	uint64_t kPL1RowCount{ 0 };
-	uint64_t kPL2RowCount{ 0 };
-
-	for (auto& row : kSVL.rows()) {
-		kSVLRowCount += std::count_if(row.cells().begin(), row.cells().end(), [](const XLCell& c) {
-			return c.value().type() != XLValueType::Empty;
-			});
-	}
-
-	for (auto& row : kPL1.rows()) {
-		kPL1RowCount += std::count_if(row.cells().begin(), row.cells().end(), [](const XLCell& c) {
-			return c.value().type() != XLValueType::Empty;
-			});
-	}
-
-	for (auto& row : kPL2.rows()) {
-		kPL2RowCount += std::count_if(row.cells().begin(), row.cells().end(), [](const XLCell& c) {
-			return c.value().type() != XLValueType::Empty;
-			});
-	}
-
 	//입력 텍스트 파일 읽고 저장
 	//wstring은 wide string, 한국어 extended unicode 입력받기 위함
 	std::string fileName;
@@ -170,18 +113,6 @@ int main() {
 		std::cout << inputFBuffer << fileSize << std::endl;
 	}
 
-	
-	/*
-	int distanceOfkSVL = std::distance(rngForkSVL.begin(), rngForkSVL.end());
-	int distanceOfkPL1 = std::distance(rngForkPL1.begin(), rngForkPL1.end());
-	int distanceOfkPL2 = std::distance(rngForkPL2.begin(), rngForkPL2.end());
-
-	for (int i{ 0 }; i < distanceOfkPL1; i++) {
-		for (int j{ 0 }; )
-		wchar_t* charArticle = std::wcsstr(wcharArticle, )
-	}
-	*/
-	
 	/*
 	이차원 벡터를 이용해서 문장의 어절 단위로 각 인덱스에 wchar_t로 넣음
 	일반적인 배열은 다음과 같이 이차원으로 만듦: int arr[][];
@@ -215,19 +146,19 @@ int main() {
 			sentencePtr = strtok_s(nullptr, " ", &context);
 			colNum++;
 		}
-
-		for (int i{ 0 }; i < rowNum; i++) {
-			for (int j{ 0 }; j < colNum; j++) {
-				std::cout << articleDiv.at(i).at(j);
-			}
-		}
-
 		articleDiv.push_back(token);
 		charArticlePtr = strtok_s(nullptr, ".!?", &context);
-		rowNum++;
+		rowNum++;	
 	}
 
-	std::cout << articleDiv.at(0).at(0) << ' ' << articleDiv.at(0).at(1) << ' ' << articleDiv.at(0).at(2);
+	/*for (int i{ 0 }; i < articleDiv.size(); i++) {
+		for (int j{ 0 }; j < articleDiv.at(i).size(); j++) {
+			char* target = strchr(articleDiv.at(i).at(j), );
+		}
+	}*/
+
+	std::cout << '\n';
+	std::cout << articleDiv.at(0).at(0) << ' ' << articleDiv.at(0).at(1) << ' ' << articleDiv.at(0).at(2) << std::endl;
 	
 	
 
@@ -243,8 +174,6 @@ int main() {
 
 	delete[] inputFBuffer;
 	inputF.close();
-	korStudyVocabList.close();
-	korParticleList.close();
 
 	return 0;
 	}
