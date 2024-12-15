@@ -78,6 +78,39 @@ wchar_t pred() {
 }
 */
 
+
+std::string removeNum(const std::string& input) {
+	std::string result;
+	for (char ch : input) {
+		if (!std::isdigit(ch)) {
+			result += ch;
+		}
+	}
+	return result;
+}
+
+
+class subject {
+public:
+	
+};
+
+class object {
+
+};
+
+class verb {
+
+};
+
+class adverb {
+
+};
+
+
+
+
+
 int main() {
 
 	//이 코드 프로젝트 전체 포멧을 한국으로 설정
@@ -89,7 +122,7 @@ int main() {
 
 
 	/*===========================================================================================================*/
-
+	//koreanParticleList_Sheet1
 	std::fstream kPL_sheet1("조사 목록-격조사.csv");
 	
 
@@ -100,23 +133,24 @@ int main() {
 	char* kPL1_inputFBuffer = new char[kPL_sheet1_fileSize];
 	kPL_sheet1.read(kPL1_inputFBuffer, kPL_sheet1_fileSize);
 
-	char* context_kPL1 = nullptr;
-	char* kPL1_DivPtr = strtok_s(kPL1_inputFBuffer, "\n", &context_kPL1);
+	char* context_kPL1_file = nullptr;
+	char* kPL1_DivPtr = strtok_s(kPL1_inputFBuffer, "\n", &context_kPL1_file);
 	std::vector<std::vector<char*>> kPL1_Div;
 
 	while (kPL1_DivPtr != nullptr) {
 		std::vector<char*> token;
-		char* wordNPartsOfSpeech_Div = strtok_s(kPL1_DivPtr, ",", &context_kPL1);
+		char* context_kPL1_line = nullptr;
+		char* wordNPartsOfSpeech_Div = strtok_s(kPL1_DivPtr, ",", &context_kPL1_line);
 		while (wordNPartsOfSpeech_Div != nullptr) {
 			token.push_back(wordNPartsOfSpeech_Div);
-			wordNPartsOfSpeech_Div = strtok_s(nullptr, ",", &context_kPL1);
+			wordNPartsOfSpeech_Div = strtok_s(nullptr, ",", &context_kPL1_line);
 		}
 		kPL1_Div.push_back(token);
-		kPL1_DivPtr = strtok_s(nullptr, "\n", &context_kPL1);
+		kPL1_DivPtr = strtok_s(nullptr, "\n", &context_kPL1_file);
 	}
 
 	/*===========================================================================================================*/
-
+	//koreanParticleLis_Sheet2
 	std::fstream kPL_sheet2("조사 목록-보조사.csv");
 
 
@@ -127,19 +161,20 @@ int main() {
 	char* kPL2_inputFBuffer = new char[kPL_sheet2_fileSize];
 	kPL_sheet2.read(kPL2_inputFBuffer, kPL_sheet2_fileSize);
 
-	char* context_kPL2 = nullptr;
-	char* kPL2_DivPtr = strtok_s(kPL2_inputFBuffer, "\n", &context_kPL2);
+	char* context_kPL2_file = nullptr;
+	char* kPL2_DivPtr = strtok_s(kPL2_inputFBuffer, "\n", &context_kPL2_file);
 	std::vector<std::vector<char*>> kPL2_Div;
 
 	while (kPL2_DivPtr != nullptr) {
 		std::vector<char*> token;
-		char* wordNEmphasisNYield_Div = strtok_s(kPL2_DivPtr, ",", &context_kPL2);
+		char* context_kPL2_line = nullptr;
+		char* wordNEmphasisNYield_Div = strtok_s(kPL2_DivPtr, ",", &context_kPL2_line);
 		while (wordNEmphasisNYield_Div != nullptr) {
 			token.push_back(wordNEmphasisNYield_Div);
-			wordNEmphasisNYield_Div = strtok_s(nullptr, ",", &context_kPL2);
+			wordNEmphasisNYield_Div = strtok_s(nullptr, ",", &context_kPL2_line);
 		}
 		kPL2_Div.push_back(token);
-		kPL2_DivPtr = strtok_s(nullptr, "\n", &context_kPL2);
+		kPL2_DivPtr = strtok_s(nullptr, "\n", &context_kPL2_file);
 	}
 
 	/*===========================================================================================================*/
@@ -154,22 +189,55 @@ int main() {
 	char* rieulEndSyllable_inputFBuffer = new char[rieulEndSyllable_fileSize];
 	rieulEndSyllable.read(rieulEndSyllable_inputFBuffer, rieulEndSyllable_fileSize);
 
-	char* context_rieulEndSyllable = nullptr;
-	char* rieulEndSyllable_DivPtr = strtok_s(rieulEndSyllable_inputFBuffer, "\n", &context_rieulEndSyllable);
+	char* context_rieulEndSyllable_file = nullptr;
+	char* rieulEndSyllable_DivPtr = strtok_s(rieulEndSyllable_inputFBuffer, "\n", &context_rieulEndSyllable_file);
 	std::vector<std::vector<char*>> rieulEndSyllable_Div;
 
 	while (rieulEndSyllable_DivPtr != nullptr) {
 		std::vector<char*> token;
-		char* wordNHex_Div = strtok_s(rieulEndSyllable_DivPtr, ",", &context_rieulEndSyllable);
+		char* context_rieulEndSyllable_line = nullptr;
+		char* wordNHex_Div = strtok_s(rieulEndSyllable_DivPtr, " ", &context_rieulEndSyllable_line);
 		while (wordNHex_Div != nullptr) {
 			token.push_back(wordNHex_Div);
-			wordNHex_Div = strtok_s(nullptr, ",", &context_rieulEndSyllable);
+			wordNHex_Div = strtok_s(nullptr, " ", &context_rieulEndSyllable_line);
 		}
 		rieulEndSyllable_Div.push_back(token);
-		rieulEndSyllable_DivPtr = strtok_s(nullptr, "\n", &context_rieulEndSyllable);
+		rieulEndSyllable_DivPtr = strtok_s(nullptr, "\n", &context_rieulEndSyllable_file);
 	}
 
 	/*===========================================================================================================*/
+
+	std::fstream kSVL("한국어 학습용 단어 목록.csv");
+
+
+	kSVL.seekg(0, std::ios::end);
+	std::streamsize kSVL_fileSize = kSVL.tellg();
+	kSVL.seekg(0, std::ios::beg);
+
+	char* kSVL_inputFBuffer = new char[kSVL_fileSize];
+	kPL_sheet1.read(kSVL_inputFBuffer, kSVL_fileSize);
+
+	char* context_kSVL_file = nullptr;
+	char* kSVL_DivPtr = strtok_s(kSVL_inputFBuffer, "\n", &context_kSVL_file);
+	std::vector<std::vector<char*>> kSVL_Div;
+
+	while (kSVL_DivPtr != nullptr) {
+		std::vector<char*> token;
+		char* context_kSVL_line = nullptr;
+		char* meaningNPOS_Div = strtok_s(rieulEndSyllable_DivPtr, " ", &context_kSVL_line);
+		while (meaningNPOS_Div != nullptr) {
+			token.push_back(meaningNPOS_Div);
+			meaningNPOS_Div = strtok_s(nullptr, " ", &context_kSVL_line);
+		}
+		kSVL_Div.push_back(token);
+		rieulEndSyllable_DivPtr = strtok_s(nullptr, "\n", &context_kSVL_file);
+	}
+
+	for (const auto& kSVLRowTarget : kSVL_Div) {
+		for (const auto& kSVLColTarget : kSVLRowTarget) {
+			removeNum(kSVLColTarget);
+		}
+	}
 
 
 	//입력 텍스트 파일 읽고 저장
@@ -212,38 +280,57 @@ int main() {
 	안에 있는 벡터가, 행이 1일 경우 뒤에 2, 3, 4, 5 , 행이 6일 경우 뒤에 7, 8, 9, 10 ...
 	과 같은 방식으로 
 	*/
-	int rowNum{ 0 };
-	int colNum{ 0 };
-	char* context = nullptr;
+	char* contextArticle = nullptr;
 
-	char* charArticlePtr = strtok_s(inputFBuffer, ".!?", &context);
+	char* charArticlePtr = strtok_s(inputFBuffer, ".!?", &contextArticle);
 
 	std::vector<std::vector<char*>> articleDiv;
 
 	while (charArticlePtr != nullptr) {
 		std::vector<char*> token;
-		char* sentencePtr = strtok_s(charArticlePtr, " ", &context);
+		char* contextSentence = nullptr;
+		char* sentencePtr = strtok_s(charArticlePtr, " ", &contextSentence);
 		while (sentencePtr != nullptr) {
 			token.push_back(sentencePtr);
-			sentencePtr = strtok_s(nullptr, " ", &context);
-			colNum++;
+			sentencePtr = strtok_s(nullptr, " ", &contextSentence);
 		}
 		articleDiv.push_back(token);
-		charArticlePtr = strtok_s(nullptr, ".!?", &context);
-		rowNum++;	
+		charArticlePtr = strtok_s(nullptr, ".!?", &contextArticle);
 	}
 
-	/*for (int i{ 0 }; i < articleDiv.size(); i++) {
-		for (int j{ 0 }; j < articleDiv.at(i).size(); j++) {
-			char* target = strchr(articleDiv.at(i).at(j), );
+	
+	for (const auto& i : articleDiv) {
+		for (const auto& j : i) {
+			for (const auto& kPL1RowTarget : kPL1_Div) {
+				for (const auto& kPL1ColTarget : kPL1RowTarget) {
+					char* target = strstr(j, kPL1ColTarget);
+					if (target != nullptr) {
+						std::cout << "Found \"" << kPL1ColTarget << "\" in \"" << j << std::endl;
+					}
+				}
+			}
 		}
-	}*/
+	}
+
+	std::cout << std::endl;
+
+	int columnIdx{ 1 };
+
+	for (const auto& i : articleDiv) {
+		for (const auto& j : i) { 
+			for (const auto& kPL2RowTarget : kPL2_Div) {
+				if (columnIdx < kPL2RowTarget.size()) {
+					char* target = strstr(j, kPL2RowTarget.at(1));
+					if (target != nullptr) {
+						std::cout << "Found \"" << kPL2RowTarget.at(1) << "\" in \"" << j << std::endl;
+					}
+				
+				}
+			}
+		}
+	}
 
 	std::cout << '\n';
-	std::cout << articleDiv.at(0).at(0) << ' ' << articleDiv.at(0).at(1) << ' ' << articleDiv.at(0).at(2) << std::endl;
-	std::cout << kPL2_Div.at(0).at(0) << ' ' << kPL2_Div.at(0).at(1) << ' ' << kPL2_Div.at(0).at(2) << std::endl;
-	
-
 
 	/*
 	* 1. paragraph 문장으로 분할
@@ -251,14 +338,14 @@ int main() {
 	* 3. 
 	*/
 
-	std::wstring koreanText = L"갈갤걀걜걸겔결곌";
+	//std::wstring koreanText = L"갈갤걀걜걸겔결곌";
 
-	for (wchar_t ch : koreanText) {
-		
-		std::wcout << ch << ": U+" << (int)ch << std::endl;
-	}
+	//for (wchar_t ch : koreanText) {
+	//	
+	//	std::wcout << ch << ": U+" << (int)ch << std::endl;
+	//}
 
-	//'ㄹ' 받침만 있는 한글 음절은 28 차이가 남
+	////'ㄹ' 받침만 있는 한글 음절은 28 차이가 남
 
 
 	delete[] inputFBuffer;
