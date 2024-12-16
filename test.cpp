@@ -80,7 +80,7 @@ wchar_t pred() {
 */
 
 
-std::string removeNum(const std::string& input) {
+std::string remove_num(const std::string& input) {
 	std::string result;
 	for (char ch : input) {
 		if (!std::isdigit(ch)) {
@@ -89,6 +89,62 @@ std::string removeNum(const std::string& input) {
 	}
 	return result;
 }
+
+std::vector<std::string> split_by_delimiters(const std::string& input, const std::string& delimiters) {
+	std::vector<std::string> tokens;
+
+	size_t start{ 0 }; 
+	size_t end{ input.find_first_of(delimiters) };
+
+	while (end != std::string::npos) {
+		if (end > start) {
+			tokens.push_back(input.substr(start, end - start));
+		}
+		start = end + 1;
+		end = input.find_first_of(delimiters, start);
+	}
+
+	if (start < input.size()) {
+		tokens.push_back(input.substr(start));
+	}
+
+	return tokens;
+}
+
+// char* customStrtok(char* str, const char* delimiters) {
+//     static char* current;
+//     if (str != nullptr) {
+//         current = str;  // Initialize with the input string
+//     }
+//     if (current == nullptr) {
+//         return nullptr;  // End of tokens
+//     }
+
+//     // Skip leading delimiters and spaces
+//     while (*current && (std::strchr(delimiters, *current) || std::isspace(*current))) {
+//         current++;
+//     }
+
+//     if (*current == '\0') {
+//         return nullptr;  // No more tokens
+//     }
+
+//     char* tokenStart = current;  // Mark the beginning of the token
+
+//     // Find the next delimiter
+//     while (*current && !std::strchr(delimiters, *current)) {
+//         current++;
+//     }
+
+//     if (*current) {
+//         *current = '\0';  // Null-terminate the token
+//         current++;        // Move to the next position
+//     } else {
+//         current = nullptr;  // End of tokens
+//     }
+
+//     return tokenStart;
+// }
 
 
 class subject {
@@ -113,7 +169,6 @@ class adverb {
 
 
 int main() {
-
 	//이 코드 프로젝트 전체 포멧을 한국으로 설정
 	std::locale::global(std::locale("ko_KR.UTF-8"));
 	//wcin은 wide cin 으로, 한국어 입력 받기 위해 extended unicode로 입력을 받겠다는 거, 그리고 입력 받는 형식을 한국 지역으로 설정
@@ -125,8 +180,16 @@ int main() {
 	
 
 	/*===========================================================================================================*/
+	std::cout << "Operation start kPL1" << std::endl;
+
 	//koreanParticleList_Sheet1
-	std::fstream kPL_sheet1("조사 목록-격조사.csv");
+	std::ifstream kPL_sheet1("C:\\Users\\hijun\\source\\repos\\SejongHS6CProgrammingProject\\resourcesForCode\\조사 목록-격조사.csv");
+	if (kPL_sheet1.is_open()) {
+		std::cout << "File successfully opened kPL1" << std::endl;
+	}
+	else {
+		std::cerr << "Failed to open file kPL1" << std::endl;
+	}
 
 	kPL_sheet1.seekg(0, std::ios::end);
 	std::streamsize kPL_sheet1_fileSize = kPL_sheet1.tellg();
@@ -134,32 +197,32 @@ int main() {
 	
 	char* kPL1_inputFBuffer = new char[kPL_sheet1_fileSize];
 	kPL_sheet1.read(kPL1_inputFBuffer, kPL_sheet1_fileSize);
-	std::cout << '!';
 
 	char* context_kPL1_file = nullptr;
 	char* kPL1_DivPtr = strtok_s(kPL1_inputFBuffer, "\n", &context_kPL1_file);
 	std::vector<std::vector<char*>> kPL1_Div;
-	std::cout << '@';
 
 	while (kPL1_DivPtr != nullptr) {
-		std::cout << '$';
 		std::vector<char*> token;
 		char* context_kPL1_line = nullptr;
 		char* wordNPartsOfSpeech_Div = strtok_s(kPL1_DivPtr, ",", &context_kPL1_line);
 		while (wordNPartsOfSpeech_Div != nullptr) {
-			std::cout << '#';
 			token.push_back(wordNPartsOfSpeech_Div);
 			wordNPartsOfSpeech_Div = strtok_s(nullptr, ",", &context_kPL1_line);
 		}
-		std::cout << '^';
 		kPL1_Div.push_back(token);
 		kPL1_DivPtr = strtok_s(nullptr, "\n", &context_kPL1_file);
 	}
-
+	std::cout << "Finished operation kPL1\n";
 	/*===========================================================================================================*/
 	//koreanParticleLis_Sheet2
-	std::fstream kPL_sheet2("조사 목록-보조사.csv");
-
+	std::ifstream kPL_sheet2("C:\\Users\\hijun\\source\\repos\\SejongHS6CProgrammingProject\\resourcesForCode\\조사 목록-보조사.csv");
+	if (kPL_sheet2.is_open()) {
+		std::cout << "File successfully opened kPL2" << std::endl;
+	}
+	else {
+		std::cerr << "Failed to open file kPL2" << std::endl;
+	}
 
 	kPL_sheet2.seekg(0, std::ios::end);
 	std::streamsize kPL_sheet2_fileSize = kPL_sheet2.tellg();
@@ -183,11 +246,16 @@ int main() {
 		kPL2_Div.push_back(token);
 		kPL2_DivPtr = strtok_s(nullptr, "\n", &context_kPL2_file);
 	}
-	std::cout << '!';
+	std::cout << "Finished operation kPL2\n";
 	/*===========================================================================================================*/
 
-	std::fstream rieulEndSyllable("ㄹ받침 한글 음절 유니코드.txt");
-
+	std::ifstream rieulEndSyllable("C:\\Users\\hijun\\source\\repos\\SejongHS6CProgrammingProject\\resourcesForCode\\ㄹ받침 한글 음절 유니코드.txt");
+	if (rieulEndSyllable.is_open()) {
+		std::cout << "File successfully opened rieulEndSyllable" << std::endl;
+	}
+	else {
+		std::cerr << "Failed to open file rieulEndSyllable" << std::endl;
+	}
 
 	rieulEndSyllable.seekg(0, std::ios::end);
 	std::streamsize rieulEndSyllable_fileSize = rieulEndSyllable.tellg();
@@ -211,47 +279,84 @@ int main() {
 		rieulEndSyllable_Div.push_back(token);
 		rieulEndSyllable_DivPtr = strtok_s(nullptr, "\n", &context_rieulEndSyllable_file);
 	}
-
+	std::cout << "Finished operation rieulEndSyllable\n";
 	/*===========================================================================================================*/
 
-	std::fstream kSVL("한국어 학습용 단어 목록.csv");
-
-
-	kSVL.seekg(0, std::ios::end);
-	std::streamsize kSVL_fileSize = kSVL.tellg();
-	kSVL.seekg(0, std::ios::beg);
-
-	wchar_t* kSVL_inputFBuffer = new wchar_t[kSVL_fileSize];
-	kSVL.read(kSVL_inputFBuffer, kSVL_fileSize);
-
-	char* context_kSVL_file = nullptr;
-	char* kSVL_DivPtr = strtok_s(kSVL_inputFBuffer, "\n", &context_kSVL_file);
-	std::vector<std::vector<char*>> kSVL_Div;
-
-	while (kSVL_DivPtr != nullptr) {
-		std::vector<char*> token;
-		char* context_kSVL_line = nullptr;
-		char* meaningNPOS_Div = strtok_s(rieulEndSyllable_DivPtr, " ", &context_kSVL_line);
-		while (meaningNPOS_Div != nullptr) {
-			token.push_back(meaningNPOS_Div);
-			meaningNPOS_Div = strtok_s(nullptr, " ", &context_kSVL_line);
-		}
-		kSVL_Div.push_back(token);
-		rieulEndSyllable_DivPtr = strtok_s(nullptr, "\n", &context_kSVL_file);
+	std::ifstream kSVL("C:\\Users\\hijun\\source\\repos\\SejongHS6CProgrammingProject\\resourcesForCode\\한국어 학습용 단어 목록.csv");
+	if (kSVL.is_open()) {
+		std::cout << "File successfully opened kSVL" << std::endl;
+	}
+	else {
+		std::cerr << "Failed to open file kSVL" << std::endl;
 	}
 
-	for (const auto& kSVLRowTarget : kSVL_Div) {
-		for (const auto& kSVLColTarget : kSVLRowTarget) {
-			removeNum(kSVLColTarget);
+
+	std::string kSVL_line;
+	std::vector<std::vector<std::string>> kSVL_div;
+
+	while (std::getline(kSVL, kSVL_line)) {
+		std::stringstream kSVL_elements(kSVL_line);
+		std::string token;
+		std::vector<std::string> tokens;
+
+		while (std::getline(kSVL_elements, token, ',')) {
+			tokens.push_back(token);
 		}
+
+		kSVL_div.push_back(tokens);
 	}
+
+	// kSVL.seekg(0, std::ios::end);
+	// std::streamsize kSVL_fileSize = kSVL.tellg();
+	// kSVL.seekg(0, std::ios::beg);
+	
+	// char* kSVL_inputFBuffer = nullptr;
+	
+	// try {
+	// 	kSVL_inputFBuffer = new char[kSVL_fileSize]();
+	// 	std::cout << "Memory allocation successful" << std::endl;
+
+	// 	std::strncpy(kSVL_inputFBuffer, "Hello, World!", kSVL_fileSize);
+
+	// 	std::cout << kSVL_inputFBuffer << std::endl;
+
+	// } catch (const std::bad_alloc& e) {
+	// 	std::cerr << "Memory allocation failed: " << e.what() << std::endl;
+	// 	return -1;
+	// }
+
+	
+	// kSVL.read(kSVL_inputFBuffer, kSVL_fileSize);
+
+	// char* kSVL_DivPtr = strtok(kSVL_inputFBuffer, "\n");
+	// std::vector<std::vector<char*>> kSVL_Div;
+
+	// while (kSVL_DivPtr != nullptr) {
+	// 	std::vector<char*> token;
+	// 	char* meaningNPOS_Div = strtok(kSVL_DivPtr, " ");
+	// 	while (meaningNPOS_Div != nullptr) {
+	// 		token.push_back(meaningNPOS_Div);
+	// 	}
+	// 	kSVL_Div.push_back(token);
+	// }
+
+	// for (const auto& kSVLRowTarget : kSVL_Div) {
+	// 	for (const auto& kSVLColTarget : kSVLRowTarget) {
+	// 		removeNum(kSVLColTarget);
+	// 	}
+	// }
+
+
+	std::cout << "Finished operation kSVL\n";
+
+
 
 
 	//입력 텍스트 파일 읽고 저장
 	//wstring은 wide string, 한국어 extended unicode 입력받기 위함
-	std::string fileName;
+	std::string fileName{"testDoc.txt"};
 	//열을 파일의 이름 입력받음
-	std::cin >> fileName;
+	//std::cin >> fileName;
 	//wifstream은 wide input file stream의 줄임말, inputF라는 파일 포인터 임의로 설정
 	//std::ifstream inputF(fileName);
 	//만약 위에서 입력받은 이름의 파일을 찾지 못한다면 다음을 출력
@@ -267,8 +372,17 @@ int main() {
 	std::streamsize fileSize = inputF.tellg();
 	inputF.seekg(0, std::ios::beg);
 
-	char* inputFBuffer = new char[fileSize];
-	inputF.read(inputFBuffer, fileSize);
+	//char* inputFBuffer = new char[fileSize];
+	//inputF.read(inputFBuffer, fileSize);
+
+	std::vector<char> inputFBuffer(fileSize);
+	inputF.read(inputFBuffer.data(), fileSize);
+
+	for (size_t i = 0; i < fileSize; ++i) {
+    std::cout << static_cast<unsigned>(inputFBuffer[i]) << " ";
+	}
+	std::cout << std::endl;
+
 
 	/*
 	이차원 벡터를 이용해서 문장의 어절 단위로 각 인덱스에 wchar_t로 넣음
@@ -287,56 +401,98 @@ int main() {
 	안에 있는 벡터가, 행이 1일 경우 뒤에 2, 3, 4, 5 , 행이 6일 경우 뒤에 7, 8, 9, 10 ...
 	과 같은 방식으로 
 	*/
-	char* contextArticle = nullptr;
+	
+	
+	// char* charArticlePtr = strtok(inputFBuffer, ".!?");
 
-	char* charArticlePtr = strtok_s(inputFBuffer, ".!?", &contextArticle);
+	// std::vector<std::vector<char*>> articleDiv;
 
-	std::vector<std::vector<char*>> articleDiv;
+	// while (charArticlePtr != nullptr) {
+	// 	std::cout << "Sentence: " << charArticlePtr << std::endl;
+	// 	std::vector<char*> token;
+	// 	char* sentencePtr = strtok(charArticlePtr, " ");
 
-	while (charArticlePtr != nullptr) {
-		std::vector<char*> token;
-		char* contextSentence = nullptr;
-		char* sentencePtr = strtok_s(charArticlePtr, " ", &contextSentence);
-		while (sentencePtr != nullptr) {
-			token.push_back(sentencePtr);
-			sentencePtr = strtok_s(nullptr, " ", &contextSentence);
-		}
-		articleDiv.push_back(token);
-		charArticlePtr = strtok_s(nullptr, ".!?", &contextArticle);
+	// 	while (sentencePtr != nullptr) {
+	// 		std::cout << "Token: " << sentencePtr << std::endl;
+	// 		token.push_back(sentencePtr);
+	// 		sentencePtr = strtok(nullptr, " ");
+	// 	}
+
+	// 	articleDiv.push_back(token);
+	// 	charArticlePtr = customStrtok(nullptr, ".!?");
+	// }
+
+	std::cout << "Input Buffer Content: ";
+	for (const auto& iterator : inputFBuffer) {
+		std::cout << iterator;
 	}
-
-	std::vector<int> colIdx{ 1, 2 };
-
-	for (const auto& articleRow : articleDiv) {
-		for (int colIdxes : colIdx) {
-			for (const auto& kPL1RowTarget : kPL1_Div) {
-				for (const auto& kPL1ColTarget : kPL1RowTarget) {
-					char* target = strstr(articleRow[colIdxes], kPL1ColTarget);
-					if (target != nullptr) {
-						std::wcout << "Found \"" << kPL1ColTarget << "\" in \"" << articleRow[colIdxes] << std::endl;
-					}
-				}
-			}
-		}
-	}
-
 	std::cout << std::endl;
 
-	int columnIdx{ 1 };
+	std::string buffer(inputFBuffer, fileSize);
+	const std::string article_div_delimiters{ ".!?" };
 
-	for (const auto& i : articleDiv) {
-		for (const auto& j : i) { 
-			for (const auto& kPL2RowTarget : kPL2_Div) {
-				if (columnIdx < kPL2RowTarget.size()) {
-					char* target = strstr(j, kPL2RowTarget.at(1));
-					if (target != nullptr) {
-						std::cout << "Found \"" << kPL2RowTarget.at(1) << "\" in \"" << j << std::endl;
-					}
-				
-				}
-			}
+	std::vector<std::string> article_div = split_by_delimiters(buffer, article_div_delimiters);
+	std::string sentence;
+
+	for (const auto& sentence_div : article_div) {
+		std::cout << "Sentence: " << sentence << std::endl;
+
+		char* sentence_cstr = new char[sentence.size() + 1];
+		std::strcpy(sentence_cstr, sentence.c_str());
+
+		std::vector<char*> token;
+		char* word = std::strtok(sentence_cstr, " ");
+
+		while (word != nullptr) {
+			std::cout << "Word: " << word << std::endl;
+			token.push_back(word);
+			word = std::strtok(nullptr, " ");
 		}
+
+	delete[] sentence_cstr;
 	}
+
+
+
+
+
+
+
+
+
+
+	// std::vector<int> colIdx{ 1, 2 };
+
+	// for (const auto& articleRow : article_div) {
+	// 	for (int colIdxes : colIdx) {
+	// 		for (const auto& kPL1RowTarget : kPL1_Div) {
+	// 			for (const auto& kPL1ColTarget : kPL1RowTarget) {
+	// 				char* target = strstr(articleRow[colIdxes], kPL1ColTarget);
+	// 				if (target != nullptr) {
+	// 					std::wcout << "Found \"" << kPL1ColTarget << "\" in \"" << articleRow[colIdxes] << std::endl;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// std::cout << std::endl;
+
+	// int columnIdx{ 1 };
+
+	// for (const auto& i : article_div) {
+	// 	for (const auto& j : i) { 
+	// 		for (const auto& kPL2RowTarget : kPL2_Div) {
+	// 			if (columnIdx < kPL2RowTarget.size()) {
+	// 				char* target = strstr(j, kPL2RowTarget.at(1));
+	// 				if (target != nullptr) {
+	// 					std::cout << "Found \"" << kPL2RowTarget.at(1) << "\" in \"" << j << std::endl;
+	// 				}
+				
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 
 
@@ -357,8 +513,16 @@ int main() {
 
 	////'ㄹ' 받침만 있는 한글 음절은 28 차이가 남
 
-
-	delete[] inputFBuffer;
+	delete[] kPL1_inputFBuffer;
+	delete[] kPL2_inputFBuffer;
+	delete[] rieulEndSyllable_inputFBuffer;
+	//delete[] kSVL_inputFBuffer;
+	//delete[] inputFBuffer;
+	
+	kPL_sheet1.close();
+	kPL_sheet2.close();
+	rieulEndSyllable.close();
+	kSVL.close();
 	inputF.close();
 
 	return 0;
