@@ -1,4 +1,4 @@
-﻿//C++ 언어에서 사용되는 가장 기본적인 소스 파일 C 언어에서 #include <stdio.h>라고 생각하면 됨
+//C++ 언어에서 사용되는 가장 기본적인 소스 파일 C 언어에서 #include <stdio.h>라고 생각하면 됨
 //알아야 하는 것: C++ 언어는 stream이라는 것을 이용하여 내용을 입력받고 출력함. Stream은 입력을 받거나 출력을 할 내용을 저장하는 임시 저장 공간이라고 생각하면 됨
 //그리고 이 임시 저장 공간에 있는 내용을 입력 받거나 출력하겠다는 신호를 받으면 stream을 비우고 값을 움직임
 //C++ 기본 문법: std::cin은 scanf()라고 생각하면 됨, 그 대신 %d, %s, %c 같은 입력 데이터 타입을 지정해줄 필요가 없고 >> 기호를 사용해서 저장 공간에 저장
@@ -23,6 +23,7 @@
 #include <numeric>
 #include <algorithm>
 #include <codecvt>
+#include <filesystem>
 
 //외부에서 다운받고 설치한 헤더 소스 파일 --> 프로그램이 엑셀 파일 접근/수정 등을 할 수 있게 함
 #include "OpenXLSX.hpp"
@@ -120,31 +121,37 @@ int main() {
 	//wcout은 wide cout --> wcin의 출력 버전
 	std::wcout.imbue(std::locale("ko_KR.UTF-8"));
 
+	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+	
 
 	/*===========================================================================================================*/
 	//koreanParticleList_Sheet1
 	std::fstream kPL_sheet1("조사 목록-격조사.csv");
-	
 
 	kPL_sheet1.seekg(0, std::ios::end);
 	std::streamsize kPL_sheet1_fileSize = kPL_sheet1.tellg();
 	kPL_sheet1.seekg(0, std::ios::beg);
-
+	
 	char* kPL1_inputFBuffer = new char[kPL_sheet1_fileSize];
 	kPL_sheet1.read(kPL1_inputFBuffer, kPL_sheet1_fileSize);
+	std::cout << '!';
 
 	char* context_kPL1_file = nullptr;
 	char* kPL1_DivPtr = strtok_s(kPL1_inputFBuffer, "\n", &context_kPL1_file);
 	std::vector<std::vector<char*>> kPL1_Div;
+	std::cout << '@';
 
 	while (kPL1_DivPtr != nullptr) {
+		std::cout << '$';
 		std::vector<char*> token;
 		char* context_kPL1_line = nullptr;
 		char* wordNPartsOfSpeech_Div = strtok_s(kPL1_DivPtr, ",", &context_kPL1_line);
 		while (wordNPartsOfSpeech_Div != nullptr) {
+			std::cout << '#';
 			token.push_back(wordNPartsOfSpeech_Div);
 			wordNPartsOfSpeech_Div = strtok_s(nullptr, ",", &context_kPL1_line);
 		}
+		std::cout << '^';
 		kPL1_Div.push_back(token);
 		kPL1_DivPtr = strtok_s(nullptr, "\n", &context_kPL1_file);
 	}
@@ -176,7 +183,7 @@ int main() {
 		kPL2_Div.push_back(token);
 		kPL2_DivPtr = strtok_s(nullptr, "\n", &context_kPL2_file);
 	}
-
+	std::cout << '!';
 	/*===========================================================================================================*/
 
 	std::fstream rieulEndSyllable("ㄹ받침 한글 음절 유니코드.txt");
@@ -214,8 +221,8 @@ int main() {
 	std::streamsize kSVL_fileSize = kSVL.tellg();
 	kSVL.seekg(0, std::ios::beg);
 
-	char* kSVL_inputFBuffer = new char[kSVL_fileSize];
-	kPL_sheet1.read(kSVL_inputFBuffer, kSVL_fileSize);
+	wchar_t* kSVL_inputFBuffer = new wchar_t[kSVL_fileSize];
+	kSVL.read(kSVL_inputFBuffer, kSVL_fileSize);
 
 	char* context_kSVL_file = nullptr;
 	char* kSVL_DivPtr = strtok_s(kSVL_inputFBuffer, "\n", &context_kSVL_file);
@@ -298,14 +305,15 @@ int main() {
 		charArticlePtr = strtok_s(nullptr, ".!?", &contextArticle);
 	}
 
-	
-	for (const auto& i : articleDiv) {
-		for (const auto& j : i) {
+	std::vector<int> colIdx{ 1, 2 };
+
+	for (const auto& articleRow : articleDiv) {
+		for (int colIdxes : colIdx) {
 			for (const auto& kPL1RowTarget : kPL1_Div) {
 				for (const auto& kPL1ColTarget : kPL1RowTarget) {
-					char* target = strstr(j, kPL1ColTarget);
+					char* target = strstr(articleRow[colIdxes], kPL1ColTarget);
 					if (target != nullptr) {
-						std::cout << "Found \"" << kPL1ColTarget << "\" in \"" << j << std::endl;
+						std::wcout << "Found \"" << kPL1ColTarget << "\" in \"" << articleRow[colIdxes] << std::endl;
 					}
 				}
 			}
@@ -329,6 +337,8 @@ int main() {
 			}
 		}
 	}
+
+
 
 	std::cout << '\n';
 
