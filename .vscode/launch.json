@@ -8,14 +8,14 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:\\Users\\hijun\\source\\repos\\SejongHS6CProgrammingProject\\out\\build\\x64-debug\\output\\MyProject.exe",
+            "program": "{exe file location}",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "C:\\Program Files\\mingw64\\bin\\gdb.exe",
+            "miDebuggerPath": "{gdb.exe file location}",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
